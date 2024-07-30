@@ -1,6 +1,8 @@
 # admin.py
 from django import forms
 from django.contrib import admin
+
+from django.contrib.admin import AdminSite
 from .models import Branch, CustomUser
 from django.contrib.auth.models import Group
 
@@ -23,6 +25,9 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 
-
+class BranchAdminSite(AdminSite):
+    site_header = "Coffee Shop Admin"
+    site_title = "Manager Portal"
+    index_title = "Welcome to the Admin Portal"
 
 

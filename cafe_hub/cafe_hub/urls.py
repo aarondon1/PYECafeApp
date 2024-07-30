@@ -17,21 +17,32 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path,include
-from customer.views import Menu
+from preOrderApp.views import Menu
 from inventory.views import Dashboard
 from main import views
+from main.models import Branch
+from main.views import generate_branch_admin_urls
+from main.admin_sites import branch_admin_sites,populate_branch_admin_sites,create_branch_admin_sites
+
+def generate_branch_admin_urls():
+    if not branch_admin_sites:
+        populate_branch_admin_sites()
+    
+    urlpatterns = []
+    for branch_name, admin_site in branch_admin_sites.items():
+        branch_name_safe = branch_name.replace(' ', '-')
+        urlpatterns.append(path(f'{branch_name_safe}-admin/', admin_site.urls))
+    return urlpatterns
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('main.urls')), 
-    path('', views.index, name='index'),
-    path('menu/',include('customer.urls')),
+    path('', include('main.urls')), 
+    path('homepage', views.index, name='index'),
+    path('menu/',include('preOrderApp.urls')),
     path('seating/',include('seating_main.urls')),
     path('inventory/', include('inventory.urls')),
-    #path('branch/<int:pk>/', views.branch_detail, name='branch_detail'),
-    path('inventory_management/', include('inventory_management.urls')),
-    #path('branch/<int:pk>/menu/', Menu.as_view(), name='menu'),
-    #path('branch/<int:pk>/inventory/',Dashboard.as_view() , name='inventory'),
-]
+] 
 
+urlpatterns += generate_branch_admin_urls()
 

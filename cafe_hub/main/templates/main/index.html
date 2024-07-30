@@ -104,15 +104,18 @@ h1 {
 <body>
     {% if user.is_authenticated %}
     <div class="header">
-        <h1>Welcome to {{ branch.name }}'s App Center, {{ user.username }}</h1>
+        <h1>Welcome to {{ user.branch.name }}'s App Center, {{ user.username }}</h1>
         <div class="button-container">
             <form method="POST" action="{% url 'logout' %}" class="form-logout">
                 {% csrf_token %}
                 <button type="submit">Log Out</button>
             </form>
-            {% if user.is_superuser or user_role == 'admin' %}
+            {% if user_role == 'admin' %} 
             <a href="{% url 'create_branch' %}" class="btn">Create a New Branch</a>
-            <a href="{% url 'redirect_to_admin' %}" class="btn btn-primary">Go to Admin Interface</a>
+            <a href="{% url 'redirect_admin' user.branch.name %}" class="btn btn-primary">Go to Admin Interface</a>
+            {% elif user.is_superuser %}
+            <a href="{% url 'create_branch' %}" class="btn">Create a New Branch</a>
+            <a href="{% url 'redirect_to_admin'  %}" class="btn btn-primary">Go to Admin Interface</a>
             {% endif %}        
         </div>
     </div>    

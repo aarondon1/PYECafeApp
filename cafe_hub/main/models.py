@@ -13,7 +13,7 @@ class Branch(models.Model):
     address = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=200, blank=True, null=True)
     zip_code = models.CharField(max_length=10,blank=True, null=True)  
-    
+    created_by = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='branches',blank=True, null=True)
     
 
     def __str__(self):

@@ -1,8 +1,9 @@
-# views.py
+# main/views.py
+
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
-from django.urls import reverse
+from django.urls import path, reverse
 from .decorators import unauthenticated_user
 from main.models import Branch
 from .forms import SignUpForm
@@ -10,6 +11,9 @@ from .forms import BranchForm
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+
+from .admin_sites import branch_admin_sites, populate_branch_admin_sites
+
 
 
 @unauthenticated_user
@@ -19,8 +23,7 @@ def login_view(request):
         if login_form.is_valid():
             user = login_form.get_user()
             login(request, user)
-            next_url = request.GET.get('next', 'search')
-            return redirect(next_url)
+            
         else:
             print(login_form.errors)
     else:
@@ -37,20 +40,26 @@ def signup_view(request):
             user.save()
 
             role = signup_form.cleaned_data['role']
-            if role == 'Customer':
+            if role == 'customer':
                 group = Group.objects.get(name='customer')
-            elif role == 'Uber-User':
+            elif role == 'uber-user':
                 group = Group.objects.get(name='uber-user')
-            elif role == 'Admin':
+            elif role == 'admin':
                 group = Group.objects.get(name='admin')
             else:
                 group = None
 
-            if group:
-                user.groups.add(group)
+            user.groups.add(group)
+            user.save()
+            
 
             login(request, user)
-            return redirect('search')
+            if get_user_role== 'customer':
+                next_url = request.GET.get('next', 'search')
+            else:
+                next_url = request.GET.get('next', 'create_branch')
+            return redirect(next_url)
+            
     else:
         signup_form = SignUpForm()
 
@@ -111,6 +120,9 @@ def index(request):
 def is_admin(user):
     return user.is_superuser or user.role == 'admin'
 
+
+
+
 @user_passes_test(is_admin)
 def create_branch(request):
     if request.method == 'POST':
@@ -137,3 +149,20 @@ def branch_detail(request, branch_id):
 @user_passes_test(is_admin)
 def redirect_to_admin(request):
     return redirect(reverse('admin:main_customuser_changelist'))
+
+
+def generate_branch_admin_urls():
+    if not branch_admin_sites:
+        populate_branch_admin_sites()
+    
+    urlpatterns = []
+    for branch_name, admin_site in branch_admin_sites.items():
+        branch_name_safe = branch_name.replace(' ', '-')
+        urlpatterns.append(path(f'{branch_name_safe}-admin/', admin_site.urls))
+    return urlpatterns
+
+@login_required
+def redirect_to_branch_admin(request, branch_name):
+    branch_name_safe = branch_name.replace(' ', '-')
+    
+    return redirect(f'/{branch_name_safe}-admin/')

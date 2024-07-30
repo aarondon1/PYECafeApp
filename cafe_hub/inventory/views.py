@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, View, CreateView, UpdateView, DeleteView
 from .models import InventoryItem, Category
 from .forms import InventoryItemForm
-from inventory_management.settings import LOW_INVENTORY_THRESHOLD
+from cafe_hub.settings import LOW_INVENTORY_THRESHOLD
 from django.contrib import messages
 
 class Index(TemplateView):
@@ -11,17 +11,17 @@ class Index(TemplateView):
     
 class Dashboard(View):
     def get(self, request):
-        items = InventoryItem.objects.filter(User=self.request.user.id).order_by('id')
-        
-        low_inventory = InventoryItem.objects.filter(User=self.request.user.id, quantity__lte=LOW_INVENTORY_THRESHOLD)
-        
+        branch = request.user.branch
+        items = InventoryItem.objects.filter(branch=branch).order_by('id')
+    
+        low_inventory = InventoryItem.objects.filter(branch=branch, quantity__lte=LOW_INVENTORY_THRESHOLD)
         if low_inventory.count() > 0:
             if low_inventory.count() > 1:
                 messages.error(request, f'You have {low_inventory.count()} items with low inventory')
             else:
                 messages.error(request, f'You have {low_inventory.count()} item with low inventory')
         
-        low_inventory_ids = InventoryItem.objects.filter(User=self.request.user.id, quantity__lte=LOW_INVENTORY_THRESHOLD).values_list('id', flat=True)
+        low_inventory_ids = InventoryItem.objects.filter(branch=branch, quantity__lte=LOW_INVENTORY_THRESHOLD).values_list('id', flat=True)
         
         
         return render(request, 'inventory/dashboard.html', {'items': items, 'low_inventory_ids': low_inventory_ids})

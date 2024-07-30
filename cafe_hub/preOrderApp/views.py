@@ -4,7 +4,7 @@ from django.views import View
 from django.views import generic
 
 from main.models import Branch
-from customer.models import MenuItem
+from preOrderApp.models import MenuItem
 # Create your views here.
 
 class Index(View):
@@ -41,3 +41,6 @@ class Order(View):
 
         return render(request, 'customer/menu.html',context)
     
+def branchesView(request):
+    branches = Branch.objects.all()
+    return render(request, 'main/branches.html', {'branches': branches})

@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from preOrderApp.views import Menu
+from preOrderApp.views import Menu
 from inventory.views import Dashboard
 from main import views
 from main.models import Branch

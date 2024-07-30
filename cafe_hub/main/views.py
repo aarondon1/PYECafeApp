@@ -166,3 +166,7 @@ def redirect_to_branch_admin(request, branch_name):
     branch_name_safe = branch_name.replace(' ', '-')
     
     return redirect(f'/{branch_name_safe}-admin/')
+
+def branchesView(request):
+    branches = Branch.objects.all()
+    return render(request, 'main/branches.html', {'branches': branches})

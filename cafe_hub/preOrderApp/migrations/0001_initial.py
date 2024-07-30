@@ -34,7 +34,11 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_on', models.DateTimeField(auto_now_add=True)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=5)),
+<<<<<<< HEAD
                 ('items', models.ManyToManyField(blank=True, related_name='order', to='preOrderApp.menuitem')),
+=======
+                ('items', models.ManyToManyField(blank=True, related_name='order', to='preOrderApp.menuitems')),
+>>>>>>> bf3f59a5065a391a30df31a3a4d2a4b677523618
             ],
         ),
     ]
